@@ -101,15 +101,21 @@ public class NearestNeighbor {
 
 		reader.close();
 		reader2.close();
-
+		
+		// Hey! ---------------------------------------------------------------------------------------------------------------
+		
+		// I think that I need to add a method here to pass to set up the two arrays to be passed into my distanceCalc
+		// or can I just do a distanceCalc(testingTable, trainingTable) with two 2D arrays somehow?
+		
+		
 	}
 
 	// This method takes takes in the test data and the training data and determines
 	// the distance
 	// between the training and test data. This smaller the distance the closer the
 	// match.
-	public static double distanceCalc(double sltest, double sltrain, double swtest, double swtrain, double pltest,
-			double pltrain, double pwtest, double pwtrain) {
+	public static double distanceCalc(double sltest, double swtest, double pltest, double pwtest, double sltrain,
+			double swtrain, double pltrain, double pwtrain) {
 
 		double slength = sltest - sltrain;
 		slength = slength * slength;
@@ -129,7 +135,7 @@ public class NearestNeighbor {
 	}
 
 	// This method takes the total number that are correct match divided
-	// by the total tested 
+	// by the total tested
 	public static double accuracy(double correct, double totaltest) {
 
 		double acc = correct / totaltest;
