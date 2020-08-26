@@ -101,13 +101,40 @@ public class NearestNeighbor {
 
 		reader.close();
 		reader2.close();
+
+	}
+
+	public double void arrayFeeder(String testingTable[][], String trainingTable[][]) {
 		
-		// Hey! ---------------------------------------------------------------------------------------------------------------
+		int count = 0;
+		while (count < 75) {
+			
+			for(int x =0; x < 75; x++) {
+				testingTable[][] //iterate row of testing table
+						for (int y = 0; y<5; y++) { //iterate columns
+														
+							sltest = column[0];
+							swtest = column[1];
+							pltest = column[2];
+							pwtest = column[3];
+							
+						}
+			}
+			for(int x =0; x < 75; x++) {
+				trainingTable[][] //iterate row of training table
+						for (int y = 0; y<5; y++) { //iterate columns
+														
+							sltrain = column[0];
+							swtrain = column[1];
+							pltrain = column[2];
+							pwtrain = column[3];
+							
 		
-		// I think that I need to add a method here to pass to set up the two arrays to be passed into my distanceCalc
-		// or can I just do a distanceCalc(testingTable, trainingTable) with two 2D arrays somehow?
+			
+		}
 		
-		
+				count++;
+				distanceCalc(sltest, swtest, pltest, pwtest, sltrain, swtrain, pltrain, pwtrain);
 	}
 
 	// This method takes takes in the test data and the training data and determines
