@@ -3,36 +3,31 @@ import java.io.IOException;
 import java.io.BufferedReader;
 import java.util.Scanner;
 
+
 public class NearestNeighbor {
 
-	public static void main(String[] args) throws IOException {
-		/*-----------------------------------------------------------------------------------------------------------
-		/ Brent Harshbarger
-		/ August 16, 2020
-		/ Programming Fundamentals
-		/ Summer 2020
-		/ Programming Assignment 3 (Machine Learning)
-		/ 
-		-------------------------------------------------------------------------------------------------------------*/
+	/*-----------------------------------------------------------------------------------------------------------
+	/ Brent Harshbarger
+	/ August 16, 2020
+	/ Programming Fundamentals
+	/ Summer 2020
+	/ Programming Assignment 3 (Machine Learning)
+	/ 
+	-------------------------------------------------------------------------------------------------------------*/
 
-		/*------------------------------------------------------------------------------------------------------------
-		 * This is a simple machine learning program that uses the Nearest Neighbor algorithm. 
-		 * There are two data sets. One training and one testing. 
-		 * The program breaks up the test and training attributes into their own 2D array
-		 * The program also stores each test and training class into their on 1D array
-		 *  
-		 * 
-		 * 
-		 -------------------------------------------------------------------------------------------------------------*/
+	/*------------------------------------------------------------------------------------------------------------
+	 * This is a simple machine learning program that uses the Nearest Neighbor algorithm. 
+	 * There are two data sets. One training and one testing. 
+	 * The final goal is to determine the accuracy of the prediction between training and test data
+	 -------------------------------------------------------------------------------------------------------------*/
+
+	public static void main(String[] args) throws NumberFormatException, IOException {
 
 		// Print assignment information
 		System.out.println("Programming Fundamentals");
 		System.out.println("NAME: Brent Harshbarger");
 		System.out.println("PROGRAMMING ASSIGNMENT 3");
 		System.out.println();
-
-		String[][] trainingTable = new String[75][5];
-		String[][] testingTable = new String[75][5];
 
 		String trainPath = "iris-training-data.csv";
 		String testPath = "iris-testing-data.csv";
@@ -53,133 +48,93 @@ public class NearestNeighbor {
 
 		scan.close();
 
-		// Reading data from training file
+		System.out.println("EX#: \t TRUE LABEL, \t PREDICITED LABEL ");
+
+		// Create arrays for data
+		double sepals[][] = new double[75][2];
+		double petals[][] = new double[75][2];
+		String className[] = new String[75];
+
+		// Get the training data from the file
 		BufferedReader reader = new BufferedReader(new FileReader(trainPath));
 
-		int tRow = 0;
-		int tColumn = 0;
-		// While reads rows and for statement reads columns
-		while ((train = reader.readLine()) != null) {
-			String[] row = train.split(",");
-			tColumn = 0;
+		// Declare variable s for parsing the array
+		String line;
+		int ndx = 0;
 
-			// Test for data import is as expected
-			for (String cell : row) {
-				trainingTable[tRow][tColumn] = cell;
-				tColumn++;
+		// Parsing and processing the arrays
+		while (null != (line = reader.readLine())) {
+			String[] ar = line.split(",");
 
-				System.out.printf("%-6s", cell);
+			sepals[ndx][0] = Double.parseDouble(ar[0]);
+			sepals[ndx][1] = Double.parseDouble(ar[1]);
 
-			}
-			tRow++;
+			petals[ndx][0] = Double.parseDouble(ar[2]);
+			petals[ndx][1] = Double.parseDouble(ar[3]);
 
-			System.out.println("");
+			className[ndx] = ar[4];
 
-		}
-
-		BufferedReader reader2 = new BufferedReader(new FileReader(testPath));
-
-		int testRow = 0;
-		int testColumn = 0;
-
-		while ((test = reader2.readLine()) != null) {
-			String[] row = test.split(",");
-			testColumn = 0;
-			// Test for data import is as expected
-			for (String cell : row) {
-				testingTable[testRow][testColumn] = cell;
-				tColumn++;
-
-				System.out.printf("%-6s", cell);
-
-			}
-			testRow++;
-
-			System.out.println("");
+			++ndx;
 
 		}
 
-		reader.close();
-		reader2.close();
+		// Declare counter variable
+		int correct = 0;
+
+		// Read in the testing file and parse the data
+		BufferedReader testingReader = new BufferedReader(new FileReader(testPath));
+		while (null != (line = testingReader.readLine())) {
+			String[] ar = line.split(",");
+			double sepalLength = Double.parseDouble(ar[0]);
+			double sepalWidth = Double.parseDouble(ar[1]);
+			double petalLength = Double.parseDouble(ar[2]);
+			double petalWidth = Double.parseDouble(ar[3]);
+			String testClassName = ar[4];
+
+			// Pass data to the findNearest method
+			int nearest = findNearest(sepalLength, sepalWidth, petalLength, petalWidth, sepals, petals);
+
+			if (testClassName.equals(className[nearest])) {
+				++correct;
+
+			}
+		}
+
+		// Calculates the accuracy and prints it out
+		double pct = (double) correct / 75.0;
+
+		System.out.println("ACCURACY: " + pct * 100.0);
 
 	}
 
-	public double void arrayFeeder(String testingTable[][], String trainingTable[][]) {
-		
-		int count = 0;
-		while (count < 75) {
-			
-			for(int x =0; x < 75; x++) {
-				testingTable[][] //iterate row of testing table
-						for (int y = 0; y<5; y++) { //iterate columns
-														
-							sltest = column[0];
-							swtest = column[1];
-							pltest = column[2];
-							pwtest = column[3];
-							
-						}
-			}
-			for(int x =0; x < 75; x++) {
-				trainingTable[][] //iterate row of training table
-						for (int y = 0; y<5; y++) { //iterate columns
-														
-							sltrain = column[0];
-							swtrain = column[1];
-							pltrain = column[2];
-							pwtrain = column[3];
-							
-		
-			
-		}
-		
-				count++;
-				distanceCalc(sltest, swtest, pltest, pwtest, sltrain, swtrain, pltrain, pwtrain);
-	}
-
-	// This method takes takes in the test data and the training data and determines
-	// the distance
-	// between the training and test data. This smaller the distance the closer the
-	// match.
-	public static double distanceCalc(double sltest, double swtest, double pltest, double pwtest, double sltrain,
+	// Calculate the distance using the Euclidean distance formula
+	private static double distanceCalc(double sltest, double swtest, double pltest, final double pwtest, double sltrain,
 			double swtrain, double pltrain, double pwtrain) {
 
-		double slength = sltest - sltrain;
-		slength = slength * slength;
+		double total = Math.pow((sltrain - sltest), 2) + Math.pow((swtrain - swtest), 2)
+				+ Math.pow((pltrain - pltest), 2) + Math.pow((pwtrain - pwtest), 2);
 
-		double swidth = swtest - swtrain;
-		swidth = swidth * swidth;
-
-		double plength = pltest - pltrain;
-		plength = plength * plength;
-
-		double pwidth = pwtest - pwtrain;
-		pwidth = pwidth * pwidth;
-
-		double dist = Math.sqrt(slength + swidth + plength + pwidth);
-
-		return dist;
+		return Math.sqrt(total);
 	}
 
-	// This method takes the total number that are correct match divided
-	// by the total tested
-	public static double accuracy(double correct, double totaltest) {
+	// Find the order of the nearest or closest distance
+	private static int findNearest(double sepalLength, double sepalWidth, double petalLength, double petalWidth,
+			double[][] sepals, double[][] petals) {
 
-		double acc = correct / totaltest;
+		double nearestDistance = Double.MAX_VALUE;
+		int nearestIndex = -1;
 
-		return acc;
+		for (int i = 0; i < 75; ++i) {
+			double distance = distanceCalc(sepalLength, sepalWidth, petalLength, petalWidth, sepals[i][0], sepals[i][1],
+					petals[i][0], petals[i][1]);
+
+			if (distance < nearestDistance) {
+				nearestDistance = distance;
+				nearestIndex = i;
+
+			}
+		}
+
+		return nearestIndex;
 	}
-
-	public class IrisSetosa {
-
-	}
-
-	public class IrisVericolour {
-
-	}
-
-	public class IrisVirginica {
-
-	}
-
 }
